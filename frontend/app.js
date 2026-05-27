@@ -1,5 +1,8 @@
 // Configuración
-const API_URL = 'http://localhost:8000/api/v1';
+// Detectar si estamos en Cloudera o localhost
+const API_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:8000/api/v1'
+    : '/api/v1';  // Rutas relativas para Cloudera
 
 // Estado global
 let datosGlobales = null;

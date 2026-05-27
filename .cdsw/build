@@ -1,0 +1,3 @@
+#!/bin/bash
+# Cloudera Build Script
+pip install -r backend/requirements.txt

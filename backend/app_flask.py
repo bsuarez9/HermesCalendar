@@ -3,7 +3,7 @@ Backend Flask SIMPLE - Solo lectura del Excel
 """
 import os
 from datetime import date, datetime
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 from openpyxl import load_workbook
@@ -119,7 +119,24 @@ def obtener_posicion_actual():
 
 @app.route("/")
 def home():
-    """Health check."""
+    """Servir el frontend HTML."""
+    # Intentar servir app.html del frontend
+    frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "app.html")
+    if os.path.exists(frontend_path):
+        return send_file(frontend_path)
+
+    # Si no existe, mostrar health check
+    return jsonify({
+        "status": "ok",
+        "message": "Calendario YPF API (Flask)",
+        "version": "1.0.0",
+        "docs": "/api/v1/dashboard",
+        "data_loaded": len(_cache["calendario"]) > 0,
+    })
+
+@app.route("/health")
+def health():
+    """Health check endpoint."""
     return jsonify({
         "status": "ok",
         "message": "Calendario YPF API (Flask)",
@@ -214,6 +231,21 @@ def reload():
     if cargar_excel():
         return jsonify({"status": "ok", "message": "Recargado"})
     return jsonify({"error": "Error al recargar"}), 500
+
+
+# Rutas para servir frontend y assets
+@app.route("/frontend/<path:filename>")
+def serve_frontend(filename):
+    """Servir archivos del frontend."""
+    frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
+    return send_from_directory(frontend_dir, filename)
+
+
+@app.route("/imagenes/<path:filename>")
+def serve_images(filename):
+    """Servir imágenes."""
+    images_dir = os.path.join(os.path.dirname(__file__), "..", "imagenes")
+    return send_from_directory(images_dir, filename)
 
 
 if __name__ == "__main__":
