@@ -15,8 +15,13 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# Path al Excel
-EXCEL_PATH = os.getenv("EXCEL_FILE_PATH", "../Calendario_Argentina_2026_Completo.xlsx")
+# Path al Excel - detectar entorno
+# En Cloudera, el Excel está en /home/cdsw/HermesCalendar/
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EXCEL_PATH = os.getenv(
+    "EXCEL_FILE_PATH",
+    os.path.join(BASE_DIR, "Calendario_Argentina_2026_Completo.xlsx")
+)
 
 # Cache de datos
 _cache = {
@@ -251,6 +256,10 @@ def serve_images(filename):
 if __name__ == "__main__":
     print("🚀 Iniciando Calendario YPF API (Flask)...")
     print(f"📂 Excel: {EXCEL_PATH}")
+    print(f"📂 Base DIR: {BASE_DIR}")
     cargar_excel()
-    print("✅ Servidor listo en http://localhost:8000")
-    app.run(host="0.0.0.0", port=8000, debug=True)
+
+    # Puerto configurable (útil si 8000 está ocupado)
+    PORT = int(os.getenv("PORT", 8000))
+    print(f"✅ Servidor listo en http://0.0.0.0:{PORT}")
+    app.run(host="0.0.0.0", port=PORT, debug=True)
