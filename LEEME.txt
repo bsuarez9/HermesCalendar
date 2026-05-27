@@ -1,0 +1,123 @@
+═══════════════════════════════════════════════════════════════
+   CALENDARIO YPF - GUÍA DE USO RÁPIDA
+═══════════════════════════════════════════════════════════════
+
+📋 ARCHIVOS IMPORTANTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ INICIAR_APP.bat     → Inicia la aplicación completa (doble click)
+✅ DETENER_APP.bat     → Detiene todos los servidores
+📄 Calendario_Argentina_2026_Completo.xlsx → Datos (editar aquí)
+
+═══════════════════════════════════════════════════════════════
+   🚀 CÓMO INICIAR LA APLICACIÓN
+═══════════════════════════════════════════════════════════════
+
+1. DOBLE CLICK en "INICIAR_APP.bat"
+2. Espera a que se abran 2 ventanas (Backend y Frontend)
+3. El navegador se abre automáticamente en http://localhost:5173
+
+¡Listo! Ya puedes usar la aplicación.
+
+═══════════════════════════════════════════════════════════════
+   🛑 CÓMO DETENER LA APLICACIÓN
+═══════════════════════════════════════════════════════════════
+
+OPCIÓN A: Doble click en "DETENER_APP.bat"
+OPCIÓN B: Cierra las 2 ventanas (Backend YPF y Frontend YPF)
+
+═══════════════════════════════════════════════════════════════
+   📱 NAVEGACIÓN EN LA APP
+═══════════════════════════════════════════════════════════════
+
+La app tiene 3 PESTAÑAS en la parte superior:
+
+┌─────────────────────────────────────────────────────────────┐
+│  🏠 Dashboard  │  📅 Calendario  │  📊 Gestión de Hitos     │
+└─────────────────────────────────────────────────────────────┘
+
+🏠 DASHBOARD:
+   • Vista del día actual (D+X)
+   • Hitos del próximo día hábil
+   • Próximos feriados
+   • Hitos importantes
+
+📅 CALENDARIO:
+   • Vista MENSUAL: Calendario completo con todos los hitos
+   • Vista SEMANAL: Detalle día por día (Lun-Vie)
+   • Navegación: ← Anterior | Hoy | Siguiente →
+   • Botones: Mensual / Semanal
+
+📊 GESTIÓN DE HITOS:
+   • Próximamente (por ahora edita el Excel)
+
+═══════════════════════════════════════════════════════════════
+   ✏️ CÓMO AGREGAR/MODIFICAR HITOS
+═══════════════════════════════════════════════════════════════
+
+1. Abre: Calendario_Argentina_2026_Completo.xlsx
+2. Edita las hojas:
+   - "Hitos_Periodicos" → Hitos mensuales (D+7, D+10, etc.)
+   - "Hitos_Importantes_YPF" → Fechas específicas
+3. Guarda el archivo
+4. En la web: Click "🔄 Recargar Datos"
+5. ¡Los cambios se ven reflejados!
+
+═══════════════════════════════════════════════════════════════
+   🎨 CÓDIGO DE COLORES EN CALENDARIO
+═══════════════════════════════════════════════════════════════
+
+🟢 Verde     = Día hábil
+🔴 Rojo      = Día no hábil / Feriado
+🔵 Azul      = Hoy (día actual)
+🟡 Amarillo  = Hitos importantes
+🔵 Celeste   = Hitos periódicos
+
+═══════════════════════════════════════════════════════════════
+   ❌ SOLUCIÓN DE PROBLEMAS
+═══════════════════════════════════════════════════════════════
+
+❌ Error: "Puerto ya en uso"
+   ✅ Solución: Ejecuta "DETENER_APP.bat" y vuelve a iniciar
+
+❌ Error: "No se puede conectar al backend"
+   ✅ Solución: Verifica que las 2 ventanas estén abiertas
+               (Backend YPF y Frontend YPF)
+
+❌ No se ven los datos
+   ✅ Solución: Click en "🔄 Recargar Datos" en la web
+
+❌ Los logos no se ven
+   ✅ Solución: Verifica que la carpeta "imagenes/" exista
+               con los archivos ypf_azul.png y Proyecto Hermes_Isotipo_COL.png
+
+═══════════════════════════════════════════════════════════════
+   📞 URLs IMPORTANTES
+═══════════════════════════════════════════════════════════════
+
+Frontend (Web App):  http://localhost:5173
+Backend (API):       http://localhost:8000
+API Docs:            http://localhost:8000/api/v1/dashboard
+
+═══════════════════════════════════════════════════════════════
+   🎯 PRÓXIMAS FUNCIONALIDADES
+═══════════════════════════════════════════════════════════════
+
+⏳ Agregar/Editar hitos desde la web (sin Excel)
+⏳ Notificaciones de hitos próximos
+⏳ Exportar calendario a PDF
+⏳ Vista anual completa
+⏳ Filtros por tipo de hito
+
+═══════════════════════════════════════════════════════════════
+   ✅ RESUMEN RÁPIDO
+═══════════════════════════════════════════════════════════════
+
+INICIAR:  Doble click → INICIAR_APP.bat
+USAR:     http://localhost:5173
+DETENER:  Doble click → DETENER_APP.bat
+EDITAR:   Calendario_Argentina_2026_Completo.xlsx
+
+═══════════════════════════════════════════════════════════════
+   Proyecto Hermes • YPF 2026
+═══════════════════════════════════════════════════════════════

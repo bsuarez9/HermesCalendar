@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x backend/scripts/init_data.py)",
+      "Bash(npm --version)",
+      "Bash(pip install *)"
+    ]
+  }
+}

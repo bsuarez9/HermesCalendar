@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python main.py)",
+      "Bash(python main_simple.py)",
+      "Bash(curl http://localhost:8000/)",
+      "Bash(curl -s http://localhost:8000/)",
+      "Bash(python app_flask.py)",
+      "Bash(curl -s http://localhost:8000/api/v1/dashboard)",
+      "Bash(python -m json.tool)"
+    ]
+  }
+}

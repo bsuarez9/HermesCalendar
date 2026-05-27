@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario YPF - Sistema de Gestión de Hitos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header con logos */
+        .main-header {
+            background: white;
+            padding: 16px 32px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .main-header img {
+            height: 50px;
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .header-title h1 {
+            color: #0033A0;
+            font-size: 1.75rem;
+            margin-bottom: 4px;
+        }
+
+        .header-title .subtitle {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        /* Navegación con pestañas */
+        .nav-tabs {
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 0 32px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .tab {
+            padding: 16px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #6b7280;
+            font-size: 1rem;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            color: #0033A0;
+            background: #f3f4f6;
+        }
+
+        .tab.active {
+            color: #0033A0;
+            border-bottom-color: #0033A0;
+            background: #f9fafb;
+        }
+
+        .tab-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Contenido */
+        .content {
+            padding: 32px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Estilos del Dashboard (de dashboard.html) */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #0033A0;
+        }
+
+        .card.green { border-left-color: #10b981; }
+        .card.red { border-left-color: #ef4444; }
+        .card.yellow { border-left-color: #f59e0b; }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+
+        .posicion {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin: 16px 0;
+        }
+
+        .dia-habil {
+            text-align: center;
+            flex: 1;
+        }
+
+        .dia-habil-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .dia-habil-numero {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #0033A0;
+        }
+
+        .dia-habil-numero.proximo {
+            color: #10b981;
+        }
+
+        .arrow {
+            font-size: 2rem;
+            color: #d1d5db;
+        }
+
+        .fecha-box {
+            background: #ecfdf5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .fecha-box.today {
+            background: #dbeafe;
+        }
+
+        .hito-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .hito-item:hover {
+            background: #f3f4f6;
+        }
+
+        .check {
+            color: #10b981;
+            font-size: 1.25rem;
+        }
+
+        .hito-content {
+            flex: 1;
+        }
+
+        .hito-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .hito-descripcion {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .badge.red { background: #fee2e2; color: #991b1b; }
+        .badge.yellow { background: #fef3c7; color: #92400e; }
+        .badge.blue { background: #dbeafe; color: #1e40af; }
+
+        .feriado-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .feriado-content {
+            flex: 1;
+        }
+
+        .feriado-fecha {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .feriado-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .reload-btn {
+            background: #0033A0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 16px;
+        }
+
+        .reload-btn:hover {
+            background: #002080;
+        }
+
+        /* Estilos del Calendario */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .calendar-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .calendar-controls button {
+            background: #0033A0;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .calendar-controls button:hover {
+            background: #002080;
+        }
+
+        .calendar-controls button.secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+        .calendar-controls button.secondary:hover {
+            background: #d1d5db;
+        }
+
+        .calendar-controls button.active {
+            background: #10b981;
+        }
+
+        .month-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: #0033A0;
+            padding: 12px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .calendar-day {
+            min-height: 120px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px;
+            background: white;
+            position: relative;
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        .calendar-day.today {
+            background: #dbeafe;
+            border-color: #0033A0;
+            border-width: 2px;
+        }
+
+        .calendar-day.habil {
+            background: #f0fdf4;
+        }
+
+        .calendar-day.no-habil {
+            background: #fef2f2;
+        }
+
+        .day-number {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .day-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .day-hitos {
+            font-size: 0.75rem;
+        }
+
+        .day-hito {
+            background: #0033A0;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .day-hito.importante {
+            background: #f59e0b;
+        }
+
+        .day-hito.feriado {
+            background: #ef4444;
+        }
+
+        /* Vista semanal */
+        .week-view {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+
+        .week-day-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            min-height: 300px;
+        }
+
+        .week-day-card.today {
+            border: 2px solid #0033A0;
+        }
+
+        .week-day-header {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            font-size: 1.125rem;
+        }
+
+        .week-day-date {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+        }
+
+        .week-hito-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con logos -->
+    <div class="main-header">
+        <img src="/imagenes/ypf_azul.png" alt="YPF Logo">
+        <div class="header-title">
+            <h1>Calendario YPF</h1>
+            <p class="subtitle">Sistema de gestión de hitos y días hábiles • Proyecto Hermes</p>
+        </div>
+        <img src="/imagenes/Proyecto Hermes_Isotipo_COL.png" alt="Hermes Logo">
+    </div>
+
+    <!-- Navegación con pestañas -->
+    <nav class="nav-tabs">
+        <button class="tab active" onclick="switchTab('dashboard')" id="tab-dashboard">
+            <span class="tab-icon">🏠</span>
+            Dashboard
+        </button>
+        <button class="tab" onclick="switchTab('calendario')" id="tab-calendario">
+            <span class="tab-icon">📅</span>
+            Calendario
+        </button>
+        <button class="tab" onclick="switchTab('hitos')" id="tab-hitos">
+            <span class="tab-icon">📊</span>
+            Gestión de Hitos
+        </button>
+    </nav>
+
+    <div class="container">
+        <div class="content">
+            <!-- Loading global -->
+            <div id="loading" class="loading">
+                <p>⏳ Cargando datos...</p>
+            </div>
+
+            <div id="error" style="display: none;"></div>
+
+            <!-- TAB 1: Dashboard (vista actual) -->
+            <div id="content-dashboard" class="tab-content active">
+                <div class="grid">
+                    <div class="card">
+                        <h2 class="card-title">
+                            <span class="card-icon">📍</span>
+                            ¿Dónde estamos hoy?
+                        </h2>
+                        <div id="posicion-actual"></div>
+                    </div>
+
+                    <div class="card green">
+                        <h2 class="card-title">
+                            <span class="card-icon">📅</span>
+                            <span id="proximo-dia-titulo">Para el D+X</span>
+                        </h2>
+                        <div id="hitos-proximo-dia"></div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card red">
+                        <h2 class="card-title">
+                            <span class="card-icon">🎉</span>
+                            Próximos Feriados
+                        </h2>
+                        <div id="feriados"></div>
+                    </div>
+
+                    <div class="card yellow">
+                        <h2 class="card-title">
+                            <span class="card-icon">⭐</span>
+                            Hitos Importantes
+                        </h2>
+                        <div id="hitos-importantes"></div>
+                        <div style="margin-top: 16px; font-size: 0.875rem; color: #6b7280;">
+                            <strong id="dias-restantes"></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="reload-btn" onclick="cargarDatos()">🔄 Recargar Datos</button>
+            </div>
+
+            <!-- TAB 2: Calendario -->
+            <div id="content-calendario" class="tab-content">
+                <div class="calendar-header">
+                    <div class="calendar-controls">
+                        <button onclick="cambiarMes(-1)">← Anterior</button>
+                        <button onclick="cambiarMes(0)">Hoy</button>
+                        <button onclick="cambiarMes(1)">Siguiente →</button>
+                    </div>
+
+                    <h2 class="month-title" id="month-title">Mayo 2026</h2>
+
+                    <div class="calendar-controls">
+                        <button class="secondary active" onclick="cambiarVista('mes')" id="btn-mes">Mensual</button>
+                        <button class="secondary" onclick="cambiarVista('semana')" id="btn-semana">Semanal</button>
+                    </div>
+                </div>
+
+                <div id="calendario-mensual" class="calendar-grid">
+                    <!-- Se genera dinámicamente -->
+                </div>
+
+                <div id="calendario-semanal" class="week-view" style="display: none;">
+                    <!-- Se genera dinámicamente -->
+                </div>
+            </div>
+
+            <!-- TAB 3: Gestión de Hitos (próximamente) -->
+            <div id="content-hitos" class="tab-content">
+                <div class="card">
+                    <h2 class="card-title">📊 Gestión de Hitos</h2>
+                    <p style="color: #6b7280; text-align: center; padding: 40px;">
+                        Próximamente: aquí podrás ver, editar y agregar hitos directamente desde la aplicación.
+                        <br><br>
+                        Por ahora, edita el Excel para agregar nuevos hitos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/frontend/app.js"></script>
+</body>
+</html>

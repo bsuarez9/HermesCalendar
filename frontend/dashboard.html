@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario YPF - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: #0033A0;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #0033A0;
+        }
+
+        .card.green { border-left-color: #10b981; }
+        .card.red { border-left-color: #ef4444; }
+        .card.yellow { border-left-color: #f59e0b; }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+
+        .posicion {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin: 16px 0;
+        }
+
+        .dia-habil {
+            text-align: center;
+            flex: 1;
+        }
+
+        .dia-habil-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .dia-habil-numero {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #0033A0;
+        }
+
+        .dia-habil-numero.proximo {
+            color: #10b981;
+        }
+
+        .arrow {
+            font-size: 2rem;
+            color: #d1d5db;
+        }
+
+        .fecha-box {
+            background: #ecfdf5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .fecha-box.today {
+            background: #dbeafe;
+        }
+
+        .hito-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .hito-item:hover {
+            background: #f3f4f6;
+        }
+
+        .check {
+            color: #10b981;
+            font-size: 1.25rem;
+        }
+
+        .hito-content {
+            flex: 1;
+        }
+
+        .hito-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .hito-descripcion {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .badge.red { background: #fee2e2; color: #991b1b; }
+        .badge.yellow { background: #fef3c7; color: #92400e; }
+        .badge.blue { background: #dbeafe; color: #1e40af; }
+
+        .feriado-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .feriado-content {
+            flex: 1;
+        }
+
+        .feriado-fecha {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .feriado-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .reload-btn {
+            background: #0033A0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 16px;
+        }
+
+        .reload-btn:hover {
+            background: #002080;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header style="display: flex; align-items: center; gap: 24px;">
+            <img src="/imagenes/ypf_azul.png" alt="YPF Logo" style="height: 60px;">
+            <div style="flex: 1;">
+                <h1>Calendario YPF</h1>
+                <p class="subtitle">Sistema de gestión de hitos y días hábiles • Proyecto Hermes</p>
+            </div>
+            <img src="/imagenes/Proyecto Hermes_Isotipo_COL.png" alt="Hermes Logo" style="height: 60px;">
+        </header>
+
+        <div id="loading" class="loading">
+            <p>⏳ Cargando datos...</p>
+        </div>
+
+        <div id="error" style="display: none;"></div>
+
+        <div id="dashboard" style="display: none;">
+            <!-- Posición Actual -->
+            <div class="grid">
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="card-icon">📍</span>
+                        ¿Dónde estamos hoy?
+                    </h2>
+                    <div id="posicion-actual"></div>
+                </div>
+
+                <!-- Hitos Próximo Día -->
+                <div class="card green">
+                    <h2 class="card-title">
+                        <span class="card-icon">📅</span>
+                        <span id="proximo-dia-titulo">Para el D+X</span>
+                    </h2>
+                    <div id="hitos-proximo-dia"></div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <!-- Feriados -->
+                <div class="card red">
+                    <h2 class="card-title">
+                        <span class="card-icon">🎉</span>
+                        Próximos Feriados
+                    </h2>
+                    <div id="feriados"></div>
+                </div>
+
+                <!-- Hitos Importantes -->
+                <div class="card yellow">
+                    <h2 class="card-title">
+                        <span class="card-icon">⭐</span>
+                        Hitos Importantes
+                    </h2>
+                    <div id="hitos-importantes"></div>
+                    <div style="margin-top: 16px; font-size: 0.875rem; color: #6b7280;">
+                        <strong id="dias-restantes"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <button class="reload-btn" onclick="cargarDatos()">🔄 Recargar Datos</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api/v1';
+
+        function formatearFecha(fechaStr) {
+            const fecha = new Date(fechaStr + 'T00:00:00');
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+            return `${dias[fecha.getDay()]}, ${fecha.getDate()} de ${meses[fecha.getMonth()]}`;
+        }
+
+        function formatearFechaCorta(fechaStr) {
+            const fecha = new Date(fechaStr + 'T00:00:00');
+            const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            return `${dias[fecha.getDay()]}, ${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
+        }
+
+        async function cargarDatos() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_URL}/dashboard`);
+                if (!response.ok) throw new Error('Error al cargar datos');
+
+                const data = await response.json();
+                renderizarDashboard(data);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').className = 'error';
+                document.getElementById('error').innerHTML = `
+                    <strong>❌ Error:</strong> No se pudo conectar con el backend.
+                    <br>Asegúrate de que el servidor esté corriendo en http://localhost:8000
+                    <br><small>${error.message}</small>
+                `;
+            }
+        }
+
+        function renderizarDashboard(data) {
+            // Posición Actual
+            const posicion = data.posicionActual;
+            document.getElementById('posicion-actual').innerHTML = `
+                <div class="fecha-box today">
+                    <strong>Hoy es</strong><br>
+                    ${formatearFecha(posicion.fechaActual)}
+                </div>
+                <div class="posicion">
+                    <div class="dia-habil">
+                        <div class="dia-habil-label">Estamos en</div>
+                        <div class="dia-habil-numero">D+${posicion.diaHabilActual}</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="dia-habil">
+                        <div class="dia-habil-label">Próximo día hábil</div>
+                        <div class="dia-habil-numero proximo">D+${posicion.proximoDiaHabil}</div>
+                    </div>
+                </div>
+                <div class="fecha-box">
+                    <strong>Próximo día hábil:</strong> ${formatearFechaCorta(posicion.fechaProximoDiaHabil)}
+                </div>
+            `;
+
+            // Hitos Próximo Día
+            document.getElementById('proximo-dia-titulo').textContent = `Para el D+${data.hitosProximoDia.diaHabil}`;
+            const hitosProximo = data.hitosProximoDia.hitosPeriodicos;
+
+            if (hitosProximo.length > 0) {
+                document.getElementById('hitos-proximo-dia').innerHTML = hitosProximo.map(hito => `
+                    <div class="hito-item">
+                        <span class="check">✓</span>
+                        <div class="hito-content">
+                            <div class="hito-title">${hito.accion}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('hitos-proximo-dia').innerHTML = `
+                    <p style="text-align: center; color: #6b7280; padding: 24px;">
+                        No hay hitos programados para este día
+                    </p>
+                `;
+            }
+
+            // Feriados
+            const feriados = data.feriadosProximos;
+            if (feriados.length > 0) {
+                document.getElementById('feriados').innerHTML = feriados.map(feriado => {
+                    const fecha = new Date(feriado.fecha + 'T00:00:00');
+                    const hoy = new Date();
+                    const dias = Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24));
+                    const texto = dias === 0 ? 'Hoy' : dias === 1 ? 'Mañana' : `En ${dias} días`;
+
+                    return `
+                        <div class="feriado-item">
+                            <div class="feriado-content">
+                                <div class="feriado-fecha">${formatearFechaCorta(feriado.fecha)}</div>
+                                <div class="feriado-desc">${feriado.observaciones || 'Feriado'}</div>
+                            </div>
+                            <span class="badge red">${texto}</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                document.getElementById('feriados').innerHTML = `<p style="text-align: center; color: #6b7280;">No hay feriados próximos</p>`;
+            }
+
+            // Hitos Importantes
+            const hitosImp = data.hitosImportantesProximos;
+            if (hitosImp.length > 0) {
+                document.getElementById('hitos-importantes').innerHTML = hitosImp.map(hito => {
+                    const dias = hito.diasHastaHito;
+                    let badgeClass = 'blue';
+                    let texto = dias === 0 ? 'Hoy' : dias === 1 ? 'Mañana' : dias < 0 ? 'Pasado' : `En ${dias} días`;
+
+                    if (dias <= 7 && dias >= 0) badgeClass = 'red';
+                    else if (dias <= 14 && dias > 7) badgeClass = 'yellow';
+
+                    return `
+                        <div class="hito-item">
+                            <div class="hito-content">
+                                <div class="hito-title">${hito.titulo}</div>
+                                <div class="hito-descripcion">${formatearFechaCorta(hito.fecha)}</div>
+                            </div>
+                            <span class="badge ${badgeClass}">${texto}</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                document.getElementById('hitos-importantes').innerHTML = `<p style="text-align: center; color: #6b7280;">No hay hitos importantes próximos</p>`;
+            }
+
+            // Días restantes
+            document.getElementById('dias-restantes').textContent =
+                `${data.diasHabilesRestantesMes} días hábiles restantes en el mes`;
+        }
+
+        // Cargar datos al iniciar
+        cargarDatos();
+
+        // Auto-refresh cada 60 segundos
+        setInterval(cargarDatos, 60000);
+    </script>
+</body>
+</html>
