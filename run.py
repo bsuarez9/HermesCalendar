@@ -10,6 +10,15 @@ from openpyxl import load_workbook
 
 # Configuración
 print("🚀 Iniciando Calendario YPF API (Flask) - Cloudera...")
+
+# Cambiar al directorio del proyecto HermesCalendar
+project_dir = '/home/cdsw/HermesCalendar'
+if os.path.exists(project_dir):
+    os.chdir(project_dir)
+    print(f"📂 Cambiado a: {project_dir}")
+else:
+    print(f"⚠️ No se encontró {project_dir}, usando directorio actual")
+
 current_dir = os.getcwd()
 print(f"📂 Working Directory: {current_dir}")
 
