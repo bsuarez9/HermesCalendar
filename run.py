@@ -239,19 +239,12 @@ def serve_images(filename):
 # Cargar datos al inicio
 cargar_excel()
 
-# Obtener puerto
+# Obtener puerto (solo para info)
 PORT = int(os.environ.get("CDSW_APP_PORT", os.environ.get("PORT", 8080)))
-print(f"✅ Aplicación Flask lista")
-print(f"📡 Puerto: {PORT}")
-print(f"🚀 Iniciando servidor Flask...")
+print(f"✅ Aplicación Flask lista en puerto {PORT}")
+print(f"🌐 Cloudera servirá automáticamente el objeto 'app'")
+print(f"📡 La app estará disponible en la URL asignada por Cloudera")
 
-# Ejecutar Flask (Cloudera espera que iniciemos el servidor)
-# Usamos threaded=True para manejar múltiples requests
-# debug=False para producción
-app.run(
-    host="0.0.0.0",
-    port=PORT,
-    debug=False,
-    threaded=True,
-    use_reloader=False  # Evitar que Flask intente recargar
-)
+# NO ejecutar app.run() - Cloudera sirve automáticamente el objeto 'app'
+# El kernel de Jupyter detecta el objeto Flask y lo expone
+# Ya hay un servidor corriendo en el puerto 8100 manejado por Cloudera
