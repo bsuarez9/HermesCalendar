@@ -241,6 +241,31 @@ cargar_excel()
 
 # Obtener puerto
 PORT = int(os.environ.get("CDSW_APP_PORT", os.environ.get("PORT", 8080)))
+
+# Limpiar puerto si está ocupado (matar procesos zombies)
+print(f"🔍 Verificando puerto {PORT}...")
+try:
+    import subprocess
+    result = subprocess.run(
+        f"lsof -ti:{PORT}",
+        shell=True,
+        capture_output=True,
+        text=True
+    )
+    if result.stdout.strip():
+        pids = result.stdout.strip().split('\n')
+        print(f"⚠️ Puerto {PORT} ocupado por PIDs: {pids}")
+        for pid in pids:
+            try:
+                subprocess.run(f"kill -9 {pid}", shell=True, check=True)
+                print(f"✅ Proceso {pid} terminado")
+            except:
+                print(f"❌ No se pudo terminar proceso {pid}")
+    else:
+        print(f"✅ Puerto {PORT} disponible")
+except Exception as e:
+    print(f"⚠️ Error verificando puerto: {e}")
+
 print(f"✅ Aplicación Flask lista")
 print(f"🚀 Iniciando servidor en puerto {PORT}...")
 
