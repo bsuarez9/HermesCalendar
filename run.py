@@ -243,38 +243,50 @@ cargar_excel()
 PORT = int(os.environ.get("CDSW_APP_PORT", os.environ.get("PORT", 8080)))
 
 # Limpiar puerto si está ocupado (matar procesos zombies)
-print(f"🔍 Verificando puerto {PORT}...")
+print(f"🔍 Limpiando puerto {PORT}...")
+import subprocess
+import time
+
 try:
-    import subprocess
+    # Intentar matar procesos en el puerto
     result = subprocess.run(
-        f"lsof -ti:{PORT}",
+        f"lsof -ti:{PORT} | xargs -r kill -9",
         shell=True,
         capture_output=True,
         text=True
     )
-    if result.stdout.strip():
-        pids = result.stdout.strip().split('\n')
-        print(f"⚠️ Puerto {PORT} ocupado por PIDs: {pids}")
-        for pid in pids:
-            try:
-                subprocess.run(f"kill -9 {pid}", shell=True, check=True)
-                print(f"✅ Proceso {pid} terminado")
-            except:
-                print(f"❌ No se pudo terminar proceso {pid}")
+    if result.returncode == 0:
+        print(f"✅ Procesos en puerto {PORT} terminados")
+        time.sleep(2)  # Esperar a que el SO libere el puerto
     else:
-        print(f"✅ Puerto {PORT} disponible")
+        print(f"✅ No hay procesos previos en puerto {PORT}")
 except Exception as e:
-    print(f"⚠️ Error verificando puerto: {e}")
+    print(f"⚠️ Error limpiando puerto: {e}")
 
 print(f"✅ Aplicación Flask lista")
 print(f"🚀 Iniciando servidor en puerto {PORT}...")
 
-# Cloudera Applications NECESITA que ejecutemos app.run()
-# Sin use_reloader para evitar conflictos con Jupyter
-app.run(
-    host="0.0.0.0",
-    port=PORT,
-    debug=False,
-    threaded=True,
-    use_reloader=False
-)
+# Reintentar bind si falla (race condition con Jupyter/Cloudera)
+import sys
+MAX_RETRIES = 3
+for attempt in range(1, MAX_RETRIES + 1):
+    try:
+        print(f"📡 Intento {attempt}/{MAX_RETRIES}...")
+        app.run(
+            host="0.0.0.0",
+            port=PORT,
+            debug=False,
+            threaded=True,
+            use_reloader=False
+        )
+        break  # Si llega aquí, funcionó
+    except OSError as e:
+        if "Address already in use" in str(e) and attempt < MAX_RETRIES:
+            print(f"⚠️ Puerto ocupado, esperando 3 segundos...")
+            time.sleep(3)
+            # Intentar matar de nuevo
+            subprocess.run(f"lsof -ti:{PORT} | xargs -r kill -9", shell=True)
+            time.sleep(2)
+        else:
+            print(f"❌ Error después de {attempt} intentos")
+            raise
