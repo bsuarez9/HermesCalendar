@@ -245,12 +245,11 @@ print(f"✅ Aplicación Flask lista")
 print(f"🚀 Iniciando servidor en puerto {PORT}...")
 
 # Ejecutar Flask - Cloudera ESPERA un servidor en este puerto
-# Importante: use_reloader=False para evitar conflictos con Jupyter
-if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        port=PORT,
-        debug=False,
-        threaded=True,
-        use_reloader=False  # CRÍTICO: False para evitar conflicto con Jupyter
-    )
+# En Jupyter/Cloudera, ejecutar directamente sin if __name__ == "__main__"
+app.run(
+    host="0.0.0.0",
+    port=PORT,
+    debug=False,
+    threaded=True,
+    use_reloader=False  # CRÍTICO: False para evitar conflicto con Jupyter
+)
