@@ -239,19 +239,9 @@ def serve_images(filename):
 # Cargar datos al inicio
 cargar_excel()
 
-# Obtener puerto
-PORT = int(os.environ.get("CDSW_APP_PORT", os.environ.get("PORT", 8080)))
+# WSGI application object - Cloudera lo detecta automáticamente
+application = app
+
 print(f"✅ Aplicación Flask lista")
-print(f"🚀 Iniciando servidor WSGI en puerto {PORT}...")
-
-# Usar Waitress en lugar de Flask dev server
-# Waitress maneja mejor el entorno Jupyter/Cloudera
-from waitress import serve
-
-serve(
-    app,
-    host="0.0.0.0",
-    port=PORT,
-    threads=4,
-    channel_timeout=60
-)
+print(f"🌐 Objeto WSGI 'application' disponible para Cloudera")
+print(f"📡 Cloudera Applications servirá automáticamente la app")
