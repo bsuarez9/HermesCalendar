@@ -4,6 +4,9 @@ Ejecuta Gunicorn desde Python para compatibilidad con Jupyter
 """
 import os
 import sys
+import subprocess
+import time
+import signal
 
 # Cambiar al directorio del proyecto
 project_dir = '/home/cdsw/HermesCalendar'
@@ -15,6 +18,33 @@ print("🚀 Iniciando Gunicorn para Calendario YPF...")
 
 # Obtener puerto de Cloudera
 PORT = int(os.environ.get("CDSW_APP_PORT", os.environ.get("PORT", 8080)))
+
+# CRÍTICO: Matar procesos zombies en el puerto
+print(f"🔍 Limpiando puerto {PORT}...")
+try:
+    # Buscar y matar procesos en el puerto
+    result = subprocess.run(
+        f"lsof -ti:{PORT}",
+        shell=True,
+        capture_output=True,
+        text=True
+    )
+    if result.stdout.strip():
+        pids = result.stdout.strip().split('\n')
+        print(f"⚠️ Encontrados PIDs en puerto {PORT}: {pids}")
+        for pid in pids:
+            try:
+                os.kill(int(pid), signal.SIGKILL)
+                print(f"✅ Proceso {pid} terminado")
+            except Exception as e:
+                print(f"⚠️ No se pudo terminar {pid}: {e}")
+        time.sleep(3)  # Esperar a que el SO libere el puerto
+    else:
+        print(f"✅ Puerto {PORT} libre")
+except Exception as e:
+    print(f"⚠️ Error limpiando puerto: {e}")
+
+time.sleep(1)  # Sleep adicional para race conditions
 
 # Importar la app antes de ejecutar Gunicorn
 from run import application
